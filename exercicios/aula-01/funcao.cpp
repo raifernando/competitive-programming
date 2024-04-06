@@ -1,3 +1,6 @@
+// FUNÇÃO
+// https://codeforces.com/contest/486/problem/A
+
 #include <bits/stdc++.h>
 using namespace std;
 

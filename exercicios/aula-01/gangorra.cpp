@@ -1,3 +1,6 @@
+// GANGORRA
+// https://neps.academy/br/exercise/260
+
 #include <bits/stdc++.h>
 using namespace std;
 
