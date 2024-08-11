@@ -4,55 +4,38 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int const MAXN = 1000;
-int const MAXM = 5000;
+#define MAX_N 1010
 
-vector<int> adj[MAXN];
-int visitado[MAXN + 10] = {0};
+int n, m, qnt = 0;
+vector<int> adj[MAX_N];
+bool visitado[MAX_N];
 
 void dfs(int s) {
-    if (visitado[s] == 1) return;
-    visitado[s] = 1;
+    if (visitado[s])
+        return;
 
-    for (auto u: adj[s]) {
+    visitado[s] = true;
+    for (auto u: adj[s])
         dfs(u);
-    }
 }
 
 int main() {
-    int n, m;
     cin >> n >> m;
 
-    set<int> alunos;
-
-    for (int i = 0; i < m; i++) {
+    for (int i = 1; i <= m; i++) {
         int a, b;
         cin >> a >> b;
-
         adj[a].push_back(b);
         adj[b].push_back(a);
-
-        alunos.insert(a);
-        alunos.insert(b);
     }
-
-    int qnt = 0;
-    dfs(*(alunos.begin()));
-    qnt++;
 
     for (int i = 1; i <= n; i++) {
-        if (alunos.find(i) == alunos.end()) {
+        if (visitado[i] == false)
             qnt++;
-            continue;
-        }
-
-        if (visitado[i] == 0) {
-            dfs(i);
-            qnt++;
-        }
+        dfs(i);
     }
-    
-    cout << qnt << endl;
+
+    cout << qnt << "\n";
 
     return 0;
 }

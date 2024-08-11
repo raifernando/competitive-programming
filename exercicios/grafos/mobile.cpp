@@ -4,84 +4,58 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int const MAX = 100000;
-vector<int> adj[MAX + 5];
-int visitados[MAX + 5];
-queue<pair<int, int>> fila;
+#define MAXN 100010
+int n;
+vector<int> adj[MAXN];
+bool vis[MAXN];
+vector<int> qnt_pendurados(MAXN, 0);
 
 void dfs(int s) {
-    if (visitados[s]) {
+    if (vis[s])
         return;
-    }
-    visitados[s] = 1;
 
-    fila.push({s, adj[s].size()});
-
-    for (auto u : adj[s]) {
+    vis[s] = true;
+    for (auto u: adj[s]) {
         dfs(u);
-        // dfs(u);
-    } 
-}
-
-bool checar(int s) {
-    if (adj[s].size() == 0)
-        return true;
-    
-    bool balanceado = 1;
-        set<int> qnt_filhos;
-        for (auto u: adj[s]) {
-            int tam = adj[u].size();
-            qnt_filhos.insert(tam);
-            balanceado = checar(u);
-        }
-
-        if (qnt_filhos.size() > 1) {
-            return false;
-        }
-
-
-    
-
-    return balanceado;
+        qnt_pendurados[s] += (qnt_pendurados[u]+1);
+    }
 }
 
 int main() {
-    int n;
     cin >> n;
 
-    int raiz;
-    for (int i = 1; i <= n; i++) {
+    for (int i = 0; i < n; i++) {
         int a, b;
         cin >> a >> b;
-
-        if (b == 0) {
-            raiz = a;
-            continue;
-        }
-
         adj[b].push_back(a);
     }
 
-    dfs(raiz);
+    int v_ini = 0;
+    dfs(v_ini);
 
-    bool balanceado = checar(raiz);
-    // for (int i = 0; i < n; i ++) {
-    //     set<int> qnt_filhos;
-    //     for (auto u: adj[raiz]) {
-    //         int tam = adj[u].size();
-    //         qnt_filhos.insert(u);
-    //     }
+    queue<int> q;
+    q.push(v_ini);
 
-    //     if (qnt_filhos.size() != 1) {
-    //         balanceado = 0;
-    //         break;
-    //     }
-    // }
+    bool ok = true;
 
-    if (!balanceado)
-        cout << "mal\n";
+    while (!q.empty() and ok) {
+        int s = q.front();
+        q.pop();
+
+        set<int> pendurados;
+        for (auto u: adj[s]) {
+            q.push(u);
+            pendurados.insert(qnt_pendurados[u]);
+        }
+
+        if (pendurados.size() > 1)
+            ok = false;
+    }
+
+    if (ok) 
+        cout << "bem\n"; 
     else
-        cout << "bem\n";
+        cout << "mal\n";
 
     return 0;
 }

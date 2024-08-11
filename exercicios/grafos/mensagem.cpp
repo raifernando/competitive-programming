@@ -4,11 +4,13 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-int main() {
-    int n, m;
-    cin >> n >> m;
+#define MAXN 100010
 
-    vector<int> adj[n+1];
+int n, m;
+vector<int> adj[MAXN];
+
+int main() {
+    cin >> n >> m;
 
     for (int i = 0; i < m; i++) {
         int a, b;
@@ -18,53 +20,58 @@ int main() {
         adj[b].push_back(a);
     }
 
-    queue<int> fila;
-    fila.push(1);
+    queue<int> q;
+    vector<pair<int,int>> caminho;
+    bool vis[n+1] = {false};
 
-    bool visitados[n+1];
-    visitados[1] = true;
+    q.push(1);
+    vis[1] = true;
+    caminho.push_back({1,0});
 
-    int distancia[n+1] = {0};
-    distancia[1] = 0;
-
-    vector<int> ordem;
-
-    while (!fila.empty()) {
-        int s = fila.front(); 
-        fila.pop();
+    int achado = false;
+    while(!q.empty()) {
+        int s = q.front();
+        q.pop();
 
         for (auto u: adj[s]) {
-            if (visitados[u] == true) continue;
-            visitados[u] = true;
+            if (vis[u])
+                continue;
 
-            distancia[u] = distancia[s] + 1;
-            fila.push(u);
+            vis[u] = true;
+            q.push(u);
+            caminho.push_back({u, s});
 
-            ordem.push_back(u);
+            if(u == n)
+                achado = true;
         }
+
+        if (achado)
+            break;
     }
 
-    int min_dist = distancia[n];
-
-    if (min_dist == 0) {
-        cout << "IMPOSSIBLE\n";
+    if (!achado) {
+        cout << "IMPOSSIBLE" << endl;
         return 0;
     }
 
-    cout << min_dist + 1 << endl;
+    stack<int> pilha;
+    int anterior = caminho[((int) caminho.size()) - 1].second;
+    pilha.push(n);
 
-    auto it = find(ordem.begin(), ordem.end(), n);
-    advance(it, -(min_dist -1));
-
-    cout << 1 << ' ';
-    for (int i = 0; i < min_dist; i++) {
-        cout << *it << ' ';
-        it++;
+    for (int i = (int) caminho.size() - 1; i >= 0; i--) {
+        if (caminho[i].first == anterior) {
+            pilha.push(anterior);
+            anterior = caminho[i].second;
+        }
     }
+
+    cout << pilha.size() << endl;
+    while(!pilha.empty()) {
+        cout << pilha.top() << ' ';
+        pilha.pop();
+    }
+
     cout << endl;
 
-    for (int i = 0; i < (int) ordem.size(); i++) {
-        cout << ordem[i] << endl;
-    }
-
+    return 0;
 }
