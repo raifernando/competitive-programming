@@ -1,3 +1,18 @@
+# todo arquivo sem extensão
+*
+!*/
+!*.*
+
+# pastas iniciando com .
+.*/
+
+# casos testes
+*.txt
+*.in
+*.out
+*.bin
+
+# outros tipos de arquivo
+*.pdf
 *.exe
-/aulas
-/.vscode
+
