@@ -4,9 +4,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define MAX 1005
 #define INF 10000000
 typedef pair<int,int> pii;
+typedef pair<int,pii> pip;
 
 int main() {
 	int t;
@@ -19,7 +19,17 @@ int main() {
 		cin >> m >> n;
 
 		char tab[n][m];
-		vector<pii> fogos;
+		int t_fogo[n][m], t_saida[n][m];
+		bool vis[n][m];
+
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				t_fogo[i][j] = INF;
+				vis[i][j] = false;
+			}
+		}
+	
+		priority_queue<pip, vector<pip>, greater<pip>> fila;
 
 		pii ini;
 
@@ -27,147 +37,152 @@ int main() {
 			for (int j = 0; j < m; j++) {
 				char c;
 				cin >> c;
-				tab[i][j] = c;
 
-				if (c == '*')
-					fogos.push_back({i, j});
-
+				if (c == '*') {
+					fila.push({0, {i, j}});
+					t_fogo[i][j] = 0;
+				}
 				if (c == '@')
 					ini = {i, j};
+
+				tab[i][j] = c;
 			}
 		}
 
-		int t_fogo[n][m], t_saida[n][m];
+		while(!fila.empty()) {
+			pii s = fila.top().second;
+			fila.pop();
+
+			if(vis[s.first][s.second])
+				continue;
+
+			vis[s.first][s.second] = true;
+
+			for (int k = 0; k < 4; k++) {
+				int posi = s.first + di[k], posj = s.second + dj[k];
+
+				if (posi < 0 or posj < 0 or posi >= n or posj >= m)
+					continue;
+
+				if (vis[posi][posj])
+					continue;
+
+				char c = tab[posi][posj];
+
+				if (c == '#')
+					continue;
+
+				if (t_fogo[posi][posj] > t_fogo[s.first][s.second] + 1) {
+					t_fogo[posi][posj] = t_fogo[s.first][s.second] + 1;
+
+					fila.push({t_fogo[posi][posj], {posi, posj}});
+				}
+			}
+		}
 
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
-				t_fogo[i][j] = INF;
+				vis[i][j] = false;
 				t_saida[i][j] = INF;
 			}
 		}
-
-		int qnt_fogos = fogos.size();
-
-		for (int i = 0; i < qnt_fogos; i++) {
-			pii ini_f = fogos[i];
-			queue<pii> q;
-			bool vis_fogo[n][m];
-
-			for (int i = 0; i < n; i++) {
-				for (int j = 0; j < m; j++) {
-					vis_fogo[i][j] = false;
-				}
-			}
-
-			q.push(ini_f);
-			vis_fogo[ini_f.first][ini_f.second] = true;
-			t_fogo[ini_f.first][ini_f.second] = 0;
-
-			while (!q.empty()) {
-				pii pos = q.front();
-				q.pop();
-
-				for (int k = 0; k < 4; k++) {
-					int posi = pos.first + di[k], posj = pos.second + dj[k];
-
-					if (posi < 0 or posi >= n or posj < 0 or posj >= m) 
-						continue;
-
-					if (vis_fogo[posi][posj] == true)
-						continue;
-
-					if (tab[posi][posj] == '#')
-						continue;
-
-					vis_fogo[posi][posj] = true;
-
-					
-
-					t_fogo[posi][posj] = min(t_fogo[posi][posj], t_fogo[pos.first][pos.second] + 1);
-					q.push({posi, posj});
-				}
-			}
-		}
-
-		// for (int i = 0; i < n; i++) {
-		// 	for (int j = 0; j < m; j++) {
-		// 		char c = tab[i][j];
-
-		// 		if (c == '#') {
-		// 			cout << "- ";
-		// 			continue;
-		// 		}
-
-		// 		cout << t_fogo[i][j] << ' ';
-		// 	}
-		// 	cout << endl;
-		// }
-
-		bool vis_saida[n][m];
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < m; j++) {
-				vis_saida[i][j] = false;
-			}
-		}
-
-		queue<pii> q_s;
-		q_s.push(ini);
-		vis_saida[ini.first][ini.second] = true;
+	
+		fila.push({0, ini});
 		t_saida[ini.first][ini.second] = 0;
 
-		while (!q_s.empty()) {
-			pii pos = q_s.front();
-			q_s.pop();
+		while(!fila.empty()) {
+			pii s = fila.top().second;
+			fila.pop();
+
+			if(vis[s.first][s.second])
+				continue;
+
+			vis[s.first][s.second] = true;
 
 			for (int k = 0; k < 4; k++) {
-				int posi = pos.first + di[k], posj = pos.second + dj[k];
+				int posi = s.first + di[k], posj = s.second + dj[k];
 
-				if (posi < 0 or posi >= n or posj < 0 or posj >= m) 
+				if (posi < 0 or posj < 0 or posi >= n or posj >= m)
 					continue;
 
-				if (vis_saida[posi][posj] == true)
+				if (vis[posi][posj])
 					continue;
 
-				if (tab[posi][posj] != '.')
+				char c = tab[posi][posj];
+
+				if (c == '#')
 					continue;
 
-				vis_saida[posi][posj] = true;
+				if (t_saida[posi][posj] > t_saida[s.first][s.second] + 1) {
+					t_saida[posi][posj] = t_saida[s.first][s.second] + 1;
 
-				t_saida[posi][posj] = min(t_saida[posi][posj], t_saida[pos.first][pos.second] + 1);
-				q_s.push({posi, posj});
+					fila.push({t_saida[posi][posj], {posi, posj}});
+				}
 			}
 		}
 
-		int t_min = INF;
+		bool possivel[n][m];
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				vis[i][j] = false;
 
+				if (tab[i][j] == '#') {
+					possivel[i][j] = false;
+					continue;
+				}
 
+				if (t_saida[i][j] < t_fogo[i][j])
+					possivel[i][j] = true;
+				else
+					possivel[i][j] = false;
+			}
+		}
+	
+		fila.push({0, ini});
 
-		int x[2] = {0, n-1};
-		for (int k = 0; k < 2; k++) {
-			for (int i = 0; i < m; i++) {
-				if (tab[x[k]][i] != '.')
+		while(!fila.empty()) {
+
+			pii s = fila.top().second;
+			fila.pop();
+
+			if(vis[s.first][s.second] or !possivel[s.first][s.second])
+				continue;
+
+			vis[s.first][s.second] = true;
+
+			for (int k = 0; k < 4; k++) {
+				int posi = s.first + di[k], posj = s.second + dj[k];
+
+				if (posi < 0 or posj < 0 or posi >= n or posj >= m)
 					continue;
 
-				if (t_fogo[x[k]][i] >= t_saida[x[k]][i])
-					t_min = min(t_min, t_saida[x[k]][i]);
+				if (vis[posi][posj])
+					continue;
+
+				if (possivel[posi][posj])
+					fila.push({t_saida[posi][posj], {posi, posj}});
 			}
 		}
 
-		int y[2] = {0, m-1};
-		for (int k = 0; k < 2; k++) {
-			for (int i = 0; i < n; i++) {
-				if (tab[i][y[k]] != '.')
+		bool saiu = false;
+		int t_final = INF;
+
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < m; j++) {
+				if (i != 0 and j != 0 and i != n-1 and j != m-1)
 					continue;
 
-				if (t_fogo[i][y[k]] >= t_saida[i][y[k]])
-					t_min = min(t_min, t_saida[i][y[k]]);
+				if (vis[i][j]) {
+					saiu = true;
+					t_final = min(t_final, t_saida[i][j]);
+				}
 			}
 		}
 
-		if (t_min == INF)
+		if (saiu) 
+			cout << t_final + 1 << endl;
+		else 
 			cout << "IMPOSSIBLE\n";
-		else
-			cout << t_min + 1 << endl;
 	}
 
 	return 0;

@@ -10,13 +10,14 @@ int n, m;
 int mat[MAX][MAX];
 bool vis[MAX][MAX] = {false};
 
+int di[4] = {1, -1, 0, 0}, dj[4] = {0, 0, 1, -1};
+
 void dfs(int i, int j) {
     if (vis[i][j])
         return;
 
     vis[i][j] = true;
 
-    int di[4] = {1, -1, 0, 0}, dj[4] = {0, 0, 1, -1};
     for (int k = 0; k < 4; k++) {
         int posi = i + di[k], posj = j + dj[k];
 
